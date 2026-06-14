@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from huggingface_hub import hf_hub_download, InferenceClient
+from huggingface_hub import hf_hub_download
 import os
 
 app = FastAPI()
@@ -24,7 +24,6 @@ hf_hub_download(repo_id="hamzaN1/mental-health-faiss", filename="index.pkl",
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 vectorstore = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 
-client = InferenceClient("mistralai/Mistral-7B-Instruct-v0.3")
 
 class Question(BaseModel):
     question: str
@@ -41,15 +40,11 @@ def ask(q: Question):
         raw_answer = context.split("Answer:")[1].strip()
     else:
         raw_answer = context
-
-    prompt = f"""You are a compassionate mental health assistant. 
-Using ONLY the information below, give a concise, warm, and direct answer in 2-3 sentences maximum.
-Do not add anything not in the information below.
-
-Information: {raw_answer}
-
-Question: {q.question}
-Answer:"""
-
-    response = client.text_generation(prompt, max_new_tokens=150, temperature=0.5)
-    return {"question": q.question, "answer": response.strip()}
+    
+    # Take first 2 sentences only
+    sentences = raw_answer.split(". ")
+    short_answer = ". ".join(sentences[:2]).strip()
+    if not short_answer.endswith("."):
+        short_answer += "."
+    
+    return {"question": q.question, "answer": short_answer}    
