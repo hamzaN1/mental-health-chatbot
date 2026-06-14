@@ -4,246 +4,674 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MindEase — Mental Health Chatbot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0f1e;
+      --bg2: #111827;
+      --bg3: #1a2236;
+      --surface: #1e2d45;
+      --border: rgba(255,255,255,0.08);
+      --accent: #6366f1;
+      --accent2: #818cf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --faint: #475569;
+    }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f4ff;
-      color: #333;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* NAVBAR */
+    /* NAV */
     nav {
-      background: #fff;
-      padding: 16px 40px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(10,15,30,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
     }
-    nav .logo { font-size: 1.5rem; font-weight: 700; color: #5b6ef5; }
-    nav a { text-decoration: none; color: #555; margin-left: 24px; font-size: 0.95rem; }
-    nav a:hover { color: #5b6ef5; }
+    .logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1.5rem;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent2); font-style: italic; }
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav ul a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 400; transition: color 0.2s; }
+    nav ul a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 100px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .nav-cta:hover { background: var(--accent2); transform: translateY(-1px); }
 
     /* HERO */
     .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 80px 20px 60px;
-      background: linear-gradient(135deg, #5b6ef5, #8b5cf6);
-      color: white;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
     }
-    .hero h1 { font-size: 3rem; margin-bottom: 16px; }
-    .hero p { font-size: 1.2rem; opacity: 0.9; max-width: 600px; margin: 0 auto 32px; }
-    .hero button {
-      background: white;
-      color: #5b6ef5;
+
+    /* Breathing orb — the signature element */
+    .orb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(99,102,241,0.15) 0%, rgba(99,102,241,0.05) 40%, transparent 70%);
+      animation: breathe 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .orb::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(129,140,248,0.1) 0%, transparent 70%);
+      animation: breathe 4s ease-in-out infinite 0.5s;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      50% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.3);
+      color: var(--accent2);
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+      position: relative;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: #fff;
+      max-width: 800px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent2);
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      position: relative;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      position: relative;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
       border: none;
-      padding: 14px 36px;
-      border-radius: 30px;
+      padding: 16px 36px;
+      border-radius: 100px;
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
     }
-    .hero button:hover { transform: scale(1.05); }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    /* STATS BAR */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 64px;
+      padding: 48px 24px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Instrument Serif', serif;
+      font-size: 2rem;
+      color: #fff;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
 
     /* FEATURES */
     .features {
-      display: flex;
-      justify-content: center;
-      gap: 32px;
-      padding: 60px 40px;
-      flex-wrap: wrap;
+      padding: 100px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 32px;
-      width: 260px;
-      text-align: center;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    .section-label {
+      font-size: 0.75rem;
+      color: var(--accent2);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 16px;
     }
-    .card .icon { font-size: 2.5rem; margin-bottom: 16px; }
-    .card h3 { margin-bottom: 10px; color: #5b6ef5; }
-    .card p { font-size: 0.9rem; color: #666; line-height: 1.6; }
-
-    /* CHATBOT SECTION */
-    .chat-section {
-      background: white;
-      max-width: 700px;
-      margin: 0 auto 60px;
+    .section-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      color: #fff;
+      font-weight: 400;
+      margin-bottom: 64px;
+      max-width: 480px;
+      line-height: 1.2;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
       border-radius: 20px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-      overflow: hidden;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
     }
-    .chat-header {
-      background: linear-gradient(135deg, #5b6ef5, #8b5cf6);
-      color: white;
-      padding: 20px 24px;
-      font-size: 1.1rem;
-      font-weight: 600;
+    .feature-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-4px); }
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
     }
-    .chat-box {
-      height: 350px;
-      overflow-y: auto;
-      padding: 20px;
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .feature-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.7; }
+
+    /* CHAT SECTION */
+    .chat-section {
+      padding: 100px 24px;
+      background: var(--bg2);
       display: flex;
       flex-direction: column;
+      align-items: center;
+    }
+    .chat-section .section-label { text-align: center; }
+    .chat-section .section-title { text-align: center; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    .chat-window {
+      width: 100%;
+      max-width: 680px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+    .chat-topbar {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
       gap: 12px;
     }
-    .msg {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 16px;
-      font-size: 0.95rem;
-      line-height: 1.5;
+    .chat-avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
     }
-    .msg.bot {
-      background: #f0f4ff;
-      color: #333;
+    .chat-topbar-info { flex: 1; }
+    .chat-topbar-info strong { font-size: 0.9rem; color: #fff; font-weight: 500; }
+    .chat-topbar-info p { font-size: 0.75rem; color: var(--muted); }
+    .online-dot {
+      width: 8px; height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .chat-messages {
+      height: 380px;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--faint) transparent;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 4px; }
+
+    .bubble {
+      max-width: 78%;
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .bubble.bot {
+      background: var(--surface);
+      color: var(--text);
       align-self: flex-start;
       border-bottom-left-radius: 4px;
     }
-    .msg.user {
-      background: #5b6ef5;
-      color: white;
+    .bubble.user {
+      background: var(--accent);
+      color: #fff;
       align-self: flex-end;
       border-bottom-right-radius: 4px;
     }
-    .chat-input {
+    .bubble.typing {
       display: flex;
-      padding: 16px;
-      border-top: 1px solid #eee;
-      gap: 10px;
+      gap: 5px;
+      align-items: center;
+      padding: 16px 20px;
     }
-    .chat-input input {
+    .dot {
+      width: 7px; height: 7px;
+      background: var(--muted);
+      border-radius: 50%;
+      animation: typing 1.2s ease-in-out infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%, 100% { opacity: 0.3; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-3px); }
+    }
+
+    .chat-input-bar {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .chat-input-bar input {
       flex: 1;
-      padding: 12px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 30px;
-      font-size: 0.95rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 18px;
+      border-radius: 100px;
+      font-size: 0.9rem;
       outline: none;
-      transition: border 0.2s;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s;
     }
-    .chat-input input:focus { border-color: #5b6ef5; }
-    .chat-input button {
-      background: #5b6ef5;
-      color: white;
+    .chat-input-bar input::placeholder { color: var(--faint); }
+    .chat-input-bar input:focus { border-color: rgba(99,102,241,0.5); }
+    .send-btn {
+      width: 44px; height: 44px;
+      background: var(--accent);
       border: none;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-size: 0.95rem;
+      border-radius: 50%;
       cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.15s;
+      flex-shrink: 0;
     }
-    .chat-input button:hover { background: #4a5ce0; }
+    .send-btn:hover { background: var(--accent2); transform: scale(1.05); }
+    .send-btn svg { width: 18px; height: 18px; fill: #fff; }
+
+    /* SUGGESTED QUESTIONS */
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 24px 16px;
+    }
+    .suggestion-chip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .suggestion-chip:hover { border-color: rgba(99,102,241,0.4); color: var(--accent2); }
+
+    /* HOW IT WORKS */
+    .how {
+      padding: 100px 48px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 64px;
+    }
+    .step { position: relative; }
+    .step-num {
+      font-family: 'Instrument Serif', serif;
+      font-size: 3.5rem;
+      color: rgba(99,102,241,0.15);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .step h3 { font-size: 1rem; font-weight: 500; color: #fff; margin-bottom: 10px; }
+    .step p { font-size: 0.875rem; color: var(--muted); line-height: 1.7; }
 
     /* FOOTER */
     footer {
-      text-align: center;
-      padding: 24px;
-      font-size: 0.85rem;
-      color: #999;
-      background: #fff;
+      padding: 40px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer p { font-size: 0.8rem; color: var(--faint); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a { font-size: 0.8rem; color: var(--faint); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--muted); }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      nav ul { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      .stats { gap: 32px; flex-wrap: wrap; padding: 32px 20px; }
+      .features { padding: 60px 20px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; }
+      .how { padding: 60px 20px; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
+  <!-- NAV -->
   <nav>
-    <div class="logo">🧠 MindEase</div>
-    <div>
-      <a href="#features">Features</a>
-      <a href="#chat">Try It</a>
-    </div>
+    <div class="logo">Mind<span>Ease</span></div>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#chat">Try it</a></li>
+      <li><a href="#how">How it works</a></li>
+    </ul>
+    <button class="nav-cta" onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">Start chatting</button>
   </nav>
 
   <!-- HERO -->
-  <div class="hero">
-    <h1>Your Mental Health Companion</h1>
-    <p>MindEase is an AI-powered chatbot trained on mental health FAQs to provide accurate, compassionate answers anytime.</p>
-    <button onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">Try It Free →</button>
+  <section class="hero">
+    <div class="orb"></div>
+    <div class="hero-badge">Free, private &amp; available 24/7</div>
+    <h1>You don't have to figure it out <em>alone</em></h1>
+    <p>MindEase is a safe space to ask questions about mental health — without judgment, without appointments, and without having to explain yourself to anyone.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('chat').scrollIntoView({behavior:'smooth'})">Talk to MindEase</button>
+      <button class="btn-ghost" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Learn more</button>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Always available</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">Free</div>
+      <div class="stat-label">No sign-up needed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">Private</div>
+      <div class="stat-label">Nothing is stored</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">Instant</div>
+      <div class="stat-label">Answers in seconds</div>
+    </div>
   </div>
 
   <!-- FEATURES -->
-  <div class="features" id="features">
-    <div class="card">
-      <div class="icon">🤖</div>
-      <h3>AI Powered</h3>
-      <p>Fine-tuned on real mental health data using state-of-the-art language models.</p>
+  <section class="features" id="features">
+    <div class="section-label">Why MindEase</div>
+    <div class="section-title">A kinder way to get answers</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>No judgment, ever</h3>
+        <p>Ask anything you've been too afraid or embarrassed to ask a real person. MindEase listens without judgment.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🕐</div>
+        <h3>Available at 3am</h3>
+        <p>Mental health doesn't follow business hours. MindEase is here whenever you need it — day or night.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Completely private</h3>
+        <p>No account needed. No history saved. What you share stays between you and MindEase, always.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">❤️</div>
+        <h3>Support for loved ones</h3>
+        <p>Not sure how to help a friend or family member struggling? MindEase can guide you on what to say and do.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📖</div>
+        <h3>Reliable information</h3>
+        <p>Answers come from verified mental health resources — not random internet forums or unqualified opinions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌱</div>
+        <h3>A first step forward</h3>
+        <p>Not a replacement for therapy, but a gentle first step. MindEase helps you understand what you're going through.</p>
+      </div>
     </div>
-    <div class="card">
-      <div class="icon">🔍</div>
-      <h3>RAG Enhanced</h3>
-      <p>Retrieval Augmented Generation ensures answers are grounded in verified information.</p>
-    </div>
-    <div class="card">
-      <div class="icon">💬</div>
-      <h3>Always Available</h3>
-      <p>Get mental health information and support 24/7, no appointments needed.</p>
-    </div>
-  </div>
+  </section>
 
-  <!-- CHAT SECTION -->
-  <div class="chat-section" id="chat">
-    <div class="chat-header">💬 Chat with MindEase</div>
-    <div class="chat-box" id="chatBox">
-      <div class="msg bot">Hi! I'm MindEase 👋 Ask me anything about mental health and I'll do my best to help.</div>
+  <!-- CHAT -->
+  <section class="chat-section" id="chat">
+    <div class="section-label">Try it now</div>
+    <div class="section-title">What's on your mind?</div>
+
+    <div class="chat-window">
+      <div class="chat-topbar">
+        <div class="chat-avatar">🧠</div>
+        <div class="chat-topbar-info">
+          <strong>MindEase</strong>
+          <p>Mental health assistant</p>
+        </div>
+        <div class="online-dot"></div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="bubble bot">Hi there 👋 I'm MindEase. This is a safe, judgment-free space. You can ask me anything — about your own feelings, someone you care about, or just to understand mental health better.</div>
+      </div>
+
+      <div class="suggestions" id="suggestions">
+        <button class="suggestion-chip" onclick="askSuggestion(this)">I've been feeling really anxious lately</button>
+        <button class="suggestion-chip" onclick="askSuggestion(this)">How do I help a friend with depression?</button>
+        <button class="suggestion-chip" onclick="askSuggestion(this)">What is anxiety disorder?</button>
+        <button class="suggestion-chip" onclick="askSuggestion(this)">When should I see a therapist?</button>
+      </div>
+
+      <div class="chat-input-bar">
+        <input type="text" id="userInput" placeholder="Ask a mental health question..." />
+        <button class="send-btn" onclick="sendMessage()" aria-label="Send">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
     </div>
-    <div class="chat-input">
-      <input type="text" id="userInput" placeholder="Ask a mental health question..." />
-      <button onclick="sendMessage()">Send</button>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Simple as having a conversation</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Type what's on your mind</h3>
+        <p>No special phrasing needed. Just write how you'd talk to a friend — MindEase understands natural language.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>MindEase finds the right answer</h3>
+        <p>It searches through a library of verified mental health information to find what's most relevant to your question.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>You get a clear, helpful response</h3>
+        <p>No medical jargon. No vague advice. Just a clear, honest answer to help you understand and take the next step.</p>
+      </div>
     </div>
-  </div>
+  </section>
 
   <!-- FOOTER -->
   <footer>
-    © 2026 MindEase. Built with ❤️ using AI & RAG technology.
+    <p>© 2026 MindEase. Here to help, not to replace professional care.</p>
+    <div class="footer-links">
+      <a href="https://github.com/hamzaN1/mental-health-chatbot" target="_blank">GitHub</a>
+      <a href="https://huggingface.co/hamzaN1/mental-health-chatbot" target="_blank">Model</a>
+      <a href="https://hamzaN1-mental-health-chatbot.hf.space/docs" target="_blank">API Docs</a>
+    </div>
   </footer>
 
   <script>
     const API_URL = "https://hamzaN1-mental-health-chatbot.hf.space/ask";
+    const messages = document.getElementById("chatMessages");
+    const input = document.getElementById("userInput");
+
+    function scrollBottom() {
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addBubble(text, type) {
+      const div = document.createElement("div");
+      div.className = `bubble ${type}`;
+      if (type === "typing") {
+        div.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+      } else {
+        div.textContent = text;
+      }
+      messages.appendChild(div);
+      scrollBottom();
+      return div;
+    }
 
     async function sendMessage() {
-      const input = document.getElementById("userInput");
-      const chatBox = document.getElementById("chatBox");
-      const question = input.value.trim();
-      if (!question) return;
+      const q = input.value.trim();
+      if (!q) return;
 
-      // Show user message
-      chatBox.innerHTML += `<div class="msg user">${question}</div>`;
+      document.getElementById("suggestions").style.display = "none";
+      addBubble(q, "user");
       input.value = "";
-      chatBox.scrollTop = chatBox.scrollHeight;
 
-      // Show typing indicator
-      chatBox.innerHTML += `<div class="msg bot" id="typing">Thinking...</div>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
+      const typing = addBubble("", "typing");
 
       try {
         const res = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ question: question })
+          body: JSON.stringify({ question: q })
         });
         const data = await res.json();
-        document.getElementById("typing").remove();
-        chatBox.innerHTML += `<div class="msg bot">${data.answer}</div>`;
-      } catch (err) {
-        document.getElementById("typing").remove();
-        chatBox.innerHTML += `<div class="msg bot">Sorry, I couldn't connect to the server. Please try again.</div>`;
+        typing.remove();
+        addBubble(data.answer, "bot");
+      } catch {
+        typing.remove();
+        addBubble("I'm having trouble connecting right now. Please try again in a moment.", "bot");
       }
-
-      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Allow Enter key to send
-    document.getElementById("userInput").addEventListener("keypress", function(e) {
+    function askSuggestion(btn) {
+      input.value = btn.textContent;
+      sendMessage();
+    }
+
+    input.addEventListener("keydown", e => {
       if (e.key === "Enter") sendMessage();
     });
   </script>
-
 </body>
 </html>
